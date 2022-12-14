@@ -29,8 +29,9 @@ class NewTaskSheet(var taskItem: TaskItem?) : BottomSheetDialogFragment()
             val editable = Editable.Factory.getInstance()
             binding.name.text = editable.newEditable(taskItem!!.name)
             binding.desc.text = editable.newEditable(taskItem!!.desc)
-            if(taskItem!!.dueTime != null){
-                dueTime = taskItem!!.dueTime!!
+            // Need to make dueTime function calls instead of variable
+            if(taskItem!!.dueTime() != null){
+                dueTime = taskItem!!.dueTime()!!
                 updateTimeButtonText()
             }
         }
@@ -75,14 +76,18 @@ class NewTaskSheet(var taskItem: TaskItem?) : BottomSheetDialogFragment()
     {
         val name = binding.name.text.toString()
         val desc = binding.desc.text.toString()
+        // Convert timePicker time into a string:
+        val dueTimeString = if(dueTime == null) null else TaskItem.timeFormatter.format(dueTime)
         if(taskItem == null)
         {
-            val newTask = TaskItem(name,desc,dueTime,null)
+            // Append dueTime to dueTimeString
+            val newTask = TaskItem(name,desc,dueTimeString,null)
             taskViewModel.addTaskItem(newTask)
         }
         else
         {
-            taskViewModel.updateTaskItem(taskItem!!.id, name, desc, dueTime)
+            // only need taskItem input instead of other parameters
+            taskViewModel.updateTaskItem(taskItem!!)
         }
         binding.name.setText("")
         binding.desc.setText("")
